@@ -15,7 +15,7 @@ You will use a KMS key of your choice to encrypt the token, as it is sensitive. 
 ##### Example
 ```
 module "kinesis_firehose" {
-  source = "disney/kinesis-firehose-splunk/aws"
+  source = "DriveClutch/kinesis-firehose-splunk/aws"
   region = "us-east-1"
   arn_cloudwatch_logs_to_ship = "arn:aws:logs:us-east-1:<aws_account_number>:log-group:/test/test01:*"  
   name_cloudwatch_logs_to_ship = "/test/test01"
@@ -32,12 +32,13 @@ module "kinesis_firehose" {
 | Variable Name | Description | Type  | Default | Required |
 |---------------|-------------|-------|---------|----------|
 | region | The region of AWS you want to work in, such as us-west-2 or us-east-1 | string | - | yes |
-| arn_cloudwatch_logs_to_ship | arn of the CloudWatch Log Group that you want to ship to Splunk. | string | - | yes |
-| name_cloudwatch_logs_to_ship | name of the CloudWatch Log Group that you want to ship to Splunk. | string | - | yes |
 | hec_token | Splunk security token needed to submit data to Splunk vai HEC URL. Encyrpted with [this](https://www.terraform.io/docs/providers/aws/d/kms_secrets.html#example-usage) procedure using a KMS key of your choice. If encrypted with specific encryption_context please set that variable. | string | - | yes |
 | kms_key_arn | arn of the KMS key you used to encrypt the hec_token | string | - | yes |
 | encryption_context | aws_kms_secrets encryption context | map | `{}` | no |
 | hec_url | Splunk Kinesis URL for submitting CloudWatch logs to splunk | string | - | yes |
+| arn_cloudwatch_logs_to_ship | arn of the CloudWatch Log Group that you want to ship to Splunk. | string | - | no |
+| name_cloudwatch_logs_to_ship | name of the CloudWatch Log Group that you want to ship to Splunk. | string | - | no |
+| prefix_cloudwatch_logs_to_ship | prefix of the CloudWatch Log Group that you want to ship to Splunk. | string | - | no |
 | hec_endpoint_type | The Splunk HEC endpoint type. | string | `Raw` | no |
 | nodejs_runtime | Runtime version of nodejs for Lambda function | string | `nodejs12.x` | no |
 | firehose_name  | Name of the Kinesis Firehose | string | `kinesis-firehose-to-splunk` | no |
@@ -61,8 +62,8 @@ module "kinesis_firehose" {
 | cloudwatch_to_fh_access_policy_name | Name of IAM policy attached to the IAM role for CloudWatch to Kinesis Firehose subscription | string | `KinesisCloudWatchToFirehosePolicy` | no |
 | cloudwatch_log_filter_name | Name of Log Filter for CloudWatch Log subscription to Kinesis Firehose | string | `KinesisSubscriptionFilter` | no |
 | subscription_filter_pattern | Filter pattern for the CloudWatch Log Group subscription to the Kinesis Firehose. See [this](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html) for filter pattern info. | string | `""` (no filter) | no |
-|local_lambda_file| The absolute path to an existing custom Lambda script| string | `null` | no |
-|local_lambda_file_handler| Allows you to specify Lambda handler if using a local custom file for Lambda function | string| `null` | no |
+| local_lambda_file| The absolute path to an existing custom Lambda script| string | `null` | no |
+| local_lambda_file_handler| Allows you to specify Lambda handler if using a local custom file for Lambda function | string| `null` | no |
 
 ### Outputs
 

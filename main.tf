@@ -126,15 +126,21 @@ POLICY
   tags = var.tags
 }
 
+data "aws_caller_identity" "current" {}
+
+locals {
+  _singleton_arn = var.arn_cloudwatch_logs_to_ship == "" ? [] : [var.arn_cloudwatch_logs_to_ship]
+  _group_arn     = var.prefix_cloudwatch_logs_to_ship == "" ? [] : ["arn:aws:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:${var.prefix_cloudwatch_logs_to_ship}*:*"]
+  policy_arns    = concat(local._singleton_arn, local._group_arn)
+}
+
 data "aws_iam_policy_document" "lambda_policy_doc" {
   statement {
     actions = [
       "logs:GetLogEvents",
     ]
 
-    resources = [
-      var.arn_cloudwatch_logs_to_ship,
-    ]
+    resources = local.policy_arns
 
     effect = "Allow"
   }
@@ -356,10 +362,25 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_to_fh" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "cloudwatch_log_filter" {
+  count           = var.name_cloudwatch_logs_to_ship == "" ? 0 : 1
   name            = var.cloudwatch_log_filter_name
   role_arn        = aws_iam_role.cloudwatch_to_firehose_trust.arn
   destination_arn = aws_kinesis_firehose_delivery_stream.kinesis_firehose.arn
   log_group_name  = var.name_cloudwatch_logs_to_ship
+  filter_pattern  = var.subscription_filter_pattern
+}
+
+data "aws_cloudwatch_log_groups" "log_groups" {
+  count                 = var.prefix_cloudwatch_logs_to_ship == "" ? 0 : 1 # this only works in tf 0.13+
+  log_group_name_prefix = var.prefix_cloudwatch_logs_to_ship
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "cloudwatch_log_filters" {
+  count           = var.prefix_cloudwatch_logs_to_ship == "" ? 0 : length(data.aws_cloudwatch_log_groups.log_groups[0].arns)
+  name            = substr(replace(element(tolist(data.aws_cloudwatch_log_groups.log_groups[0].log_group_names), count.index), "/", "-"), 1, length(data.aws_cloudwatch_log_groups.log_groups[0].arns)) #/x/y/z -> x-y-z
+  role_arn        = aws_iam_role.cloudwatch_to_firehose_trust.arn
+  destination_arn = aws_kinesis_firehose_delivery_stream.kinesis_firehose.arn
+  log_group_name  = element(tolist(data.aws_cloudwatch_log_groups.log_groups[0].log_group_names), count.index)
   filter_pattern  = var.subscription_filter_pattern
 }
 
