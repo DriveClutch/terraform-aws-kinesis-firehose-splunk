@@ -102,17 +102,17 @@ variable "kinesis_firehose_role_name" {
 }
 
 variable "arn_cloudwatch_logs_to_ship" {
-  description = "arn of the CloudWatch Log Group singleton that you want to ship to Splunk."
+  description = "arn of the CloudWatch Log Group that you want to ship to Splunk."
   default     = ""
 }
 
 variable "name_cloudwatch_logs_to_ship" {
-  description = "name of the CloudWatch Log Group singleton that you want to ship to Splunk."
+  description = "name of the CloudWatch Log Group that you want to ship to Splunk."
   default     = ""
 }
 
 variable "prefix_cloudwatch_logs_to_ship" {
-  description = "name of the CloudWatch Log Group that you want to ship to Splunk."
+  description = "prefix of the CloudWatch Log Group that you want to ship to Splunk."
   default     = ""
 }
 

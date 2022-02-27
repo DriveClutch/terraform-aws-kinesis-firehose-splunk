@@ -55,6 +55,7 @@ module "kinesis_firehose" {
 | s3_bucket_block_public_access_enabled | If statement if you would like to add the aws_s3_bucket_public_access_block terraform resource on s3 bucket Kinesis Firehose uses for backups. Set to 1 for enabled. | integer | `0` | no | 
 | s3_compression_format | The compression format for what the Kinesis Firehose puts in the s3 bucket | string | `GZIP` | no |
 | kinesis_firehose_lambda_role_name | Name of IAM Role for Lambda function that transforms CloudWatch data for Kinesis Firehose into Splunk compatible format | string | `KinesisFirehoseToLambaRole` | no |
+| lambda_function_name | Name of the Lambda function that is attached to the firehose. | string | `kinesis-firehose-transform` | no |
 | lambda_iam_policy_name | Name of the IAM policy that is attached to the IAM Role for the lambda transform function | string | `Kinesis-Firehose-to-Splunk-Policy` | no |
 | lambda_function_timeout | The function execution time at which Lambda should terminate the function. | integer | `180` | no |
 | kinesis_firehose_iam_policy_name | Name of the IAM Policy attached to IAM Role for the Kinesis Firehose | string | `KinesisFirehose-Policy` | no |
